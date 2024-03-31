@@ -23,7 +23,7 @@
 #
 
 # Default the TZ environment variable to UTC.
-TZ="Europe/Warsaw"
+TZ=Europe/Warsaw
 export TZ
 
 # Set environment variable that holds the Internal Docker IP
