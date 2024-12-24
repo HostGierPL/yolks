@@ -33,18 +33,26 @@ export INTERNAL_IP
 # Switch to the container's working directory
 cd /home/container || exit 1
 
+MAX_RAM=$(echo "${STARTUP}" | grep -oP '(?<=-Xmx)[0-9]+[MmGg]' | head -n 1)
+
+if [[ $MAX_RAM == *G ]]; then
+  MEM_TOTAL=$((${MAX_RAM%G} * 1024 * 1024))
+elif [[ $MAX_RAM == *M ]]; then
+  MEM_TOTAL=$((${MAX_RAM%M} * 1024))
+else
+  MEM_TOTAL=0
+fi
+
 unshare --mount --propagation slave -- bash -c "
   mount --bind /proc /proc &&
-
-  mkdir -p /tmp/f_proc &&
   
-  cp /proc/cpuinfo /tmp/f_proc/cpuinfo &&
+  mkdir -p /tmp/f_proc &&
   cp /proc/meminfo /tmp/f_proc/meminfo &&
   
-  sed -i 's/^processor.*/processor       : 0/' /tmp/f_proc/cpuinfo &&
-  sed -i 's/^MemTotal:.*/MemTotal:       0 kB/' /tmp/f_proc/meminfo &&
+  sed -i 's/^MemTotal:.*/MemTotal:       ${MEM_TOTAL} kB/' /tmp/f_proc/meminfo &&
   
-  mount --bind /tmp/f_proc/cpuinfo /proc/cpuinfo &&
+  chmod 444 /tmp/f_proc/meminfo &&
+  
   mount --bind /tmp/f_proc/meminfo /proc/meminfo &&
 "
 
