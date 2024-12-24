@@ -33,8 +33,11 @@ export INTERNAL_IP
 # Switch to the container's working directory
 cd /home/container || exit 1
 
-unshare --mount bash
-mount -t tmpfs tmpfs /proc
+unshare --mount --propagation slave -- bash -c "
+  mount -t tmpfs tmpfs /proc &&
+  echo 'processor       : 0' > /proc/cpuinfo &&
+  echo 'MemTotal:       0 kB' > /proc/meminfo
+"
 
 # Print Java version
 printf "\033[1m\033[33mHOSTGIER@~@\033[0mjava -version\n"
