@@ -33,26 +33,6 @@ export INTERNAL_IP
 # Switch to the container's working directory
 cd /home/container || exit 1
 
-MAX_RAM=$(echo "${STARTUP}" | grep -oP '(?<=-Xmx)[0-9]+[MmGg]' | head -n 1)
-
-if [[ $MAX_RAM == *G ]]; then
-  MEM_TOTAL=$((${MAX_RAM%G} * 1024 * 1024))
-elif [[ $MAX_RAM == *M ]]; then
-  MEM_TOTAL=$((${MAX_RAM%M} * 1024))
-else
-  MEM_TOTAL=0
-fi
-
-MEMINFO="/tmp/f_meminfo"
-cp /proc/meminfo "$MEMINFO"
-sed -i "s/^MemTotal:.*/MemTotal:       ${MEM_TOTAL} kB/" "$MEMINFO"
-
-chmod 444 "$MEMINFO"
-
-unshare --mount --propagation slave -- bash -c "
-  mount --bind $MEMINFO /proc/meminfo &&
-"
-
 # Print Java version
 printf "\033[1m\033[33mHOSTGIER@~@\033[0mjava -version\n"
 java -version
