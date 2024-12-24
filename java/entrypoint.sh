@@ -35,14 +35,17 @@ cd /home/container || exit 1
 
 unshare --mount --propagation slave -- bash -c "
   mount --bind /proc /proc &&
-  
+
   mkdir -p /tmp/f_proc &&
-  echo 'processor       : 0' > /tmp/f_proc/cpuinfo &&
-  echo 'MemTotal:       0 kB' > /tmp/f_proc/meminfo &&
+  
+  cp /proc/cpuinfo /tmp/f_proc/cpuinfo &&
+  cp /proc/meminfo /tmp/f_proc/meminfo &&
+  
+  sed -i 's/^processor.*/processor       : 0/' /tmp/f_proc/cpuinfo &&
+  sed -i 's/^MemTotal:.*/MemTotal:       0 kB/' /tmp/f_proc/meminfo &&
   
   mount --bind /tmp/f_proc/cpuinfo /proc/cpuinfo &&
   mount --bind /tmp/f_proc/meminfo /proc/meminfo &&
-  
 "
 
 # Print Java version
