@@ -33,8 +33,17 @@ export INTERNAL_IP
 # Switch to the container's working directory
 cd /home/container || exit 1
 
-echo "" > /proc/meminfo
-echo "" > /proc/cpuinfo
+FAKE_PROC_DIR="/tmp/proc"
+mkdir -p "$FAKE_PROC_DIR"
+
+echo "" > "$FAKE_PROC_DIR/meminfo"
+echo "" > "$FAKE_PROC_DIR/cpuinfo"
+
+export PROC_MEMINFO="$FAKE_PROC_DIR/meminfo"
+export PROC_CPUINFO="$FAKE_PROC_DIR/cpuinfo"
+
+alias cat="sh -c 'if [[ \$1 == /proc/meminfo ]]; then cat $PROC_MEMINFO; elif [[ \$1 == /proc/cpuinfo ]]; then cat $PROC_CPUINFO; else /bin/cat \$1; fi' --"
+
 
 # Print Java version
 printf "\033[1m\033[33mHOSTGIER@~@\033[0mjava -version\n"
