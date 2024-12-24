@@ -34,9 +34,15 @@ export INTERNAL_IP
 cd /home/container || exit 1
 
 unshare --mount --propagation slave -- bash -c "
-  mount -t tmpfs tmpfs /proc &&
-  echo 'processor       : 0' > /proc/cpuinfo &&
-  echo 'MemTotal:       0 kB' > /proc/meminfo
+  mount --bind /proc /proc &&
+  
+  mkdir -p /tmp/f_proc &&
+  echo 'processor       : 0' > /tmp/f_proc/cpuinfo &&
+  echo 'MemTotal:       0 kB' > /tmp/f_proc/meminfo &&
+  
+  mount --bind /tmp/f_proc/cpuinfo /proc/cpuinfo &&
+  mount --bind /tmp/f_proc/meminfo /proc/meminfo &&
+  
 "
 
 # Print Java version
