@@ -33,6 +33,9 @@ export INTERNAL_IP
 # Switch to the container's working directory
 cd /home/container || exit 1
 
+mount --bind /dev/null /proc/meminfo
+mount --bind /dev/null /proc/cpuinfo
+
 # Print Java version
 printf "\033[1m\033[33mHOSTGIER@~@\033[0mjava -version\n"
 java -version
