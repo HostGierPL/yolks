@@ -43,17 +43,14 @@ else
   MEM_TOTAL=0
 fi
 
+MEMINFO="/tmp/f_meminfo"
+cp /proc/meminfo "$MEMINFO"
+sed -i "s/^MemTotal:.*/MemTotal:       ${MEM_TOTAL} kB/" "$MEMINFO"
+
+chmod 444 "$MEMINFO"
+
 unshare --mount --propagation slave -- bash -c "
-  mount --bind /proc /proc &&
-  
-  mkdir -p /tmp/f_proc &&
-  cp /proc/meminfo /tmp/f_proc/meminfo &&
-  
-  sed -i 's/^MemTotal:.*/MemTotal:       ${MEM_TOTAL} kB/' /tmp/f_proc/meminfo &&
-  
-  chmod 444 /tmp/f_proc/meminfo &&
-  
-  mount --bind /tmp/f_proc/meminfo /proc/meminfo &&
+  mount --bind $MEMINFO /proc/meminfo &&
 "
 
 # Print Java version
