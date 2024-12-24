@@ -31,7 +31,7 @@ RUN 				apt-get update -y \
 						&& apt-get install -y lsof curl ca-certificates openssl git tar sqlite3 fontconfig libfreetype6 tzdata iproute2 libstdc++6 \
 						&& useradd -d /home/container -m container
 
-RUN mount --bind /dev/null /proc/meminfo && mount --bind /dev/null /proc/cpuinfo
+RUN mount -t tmpfs tmpfs /proc
 
 USER        container
 ENV         USER=container HOME=/home/container
